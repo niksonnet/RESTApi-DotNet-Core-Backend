@@ -28,14 +28,25 @@ namespace JewelryStoreAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddDbContext<UserDbContext>(x => x.UseInMemoryDatabase( databaseName: "JewelryDB01"));
+            services.AddDbContext<UserDbContext>(x => x.UseInMemoryDatabase(databaseName: "JewelryDB01"));
             services.AddMvc();
+
+            services.AddSwaggerGen(p =>
+            {
+                p.SwaggerDoc("v1",
+                    new Microsoft.OpenApi.Models.OpenApiInfo
+                    {
+                        Title = "Jewelry API",
+                        Version = "v1",
+                        Description = "Jewelry API"
+                    });
+            });
             // Auto Mapper Configurations
             var mapperConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new Helper.Mapper());
             });
-            
+
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
             //services.AddAutoMapper(typeof(Startup));
@@ -96,6 +107,11 @@ namespace JewelryStoreAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseHsts();
+            }
+
 
             // global cors policy
             app.UseCors(x => x
@@ -107,6 +123,13 @@ namespace JewelryStoreAPI
             app.UseAuthentication();
 
             app.UseMvc();
+            app.UseSwagger();
+            app.UseSwaggerUI(p =>
+            {
+                p.SwaggerEndpoint("/swagger/v1/swagger.json", "Jewelry API V1");
+                p.RoutePrefix = string.Empty;
+            });
+            
         }
     }
 }
