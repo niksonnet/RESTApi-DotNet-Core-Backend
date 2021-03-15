@@ -1,10 +1,10 @@
-﻿using JewelryStoreAPI.Service;
+﻿using API.Domain.Entity;
+using API.Infrastructure.DbContext;
+using API.Services.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace JewelryStoreAPI.Helper
 {
@@ -25,7 +25,7 @@ namespace JewelryStoreAPI.Helper
                 UtilityService.CreatePasswordHash(defaultPassword, out passwordHash, out passwordSalt);
 
                 context.Users.AddRange(
-                    new Entity.User
+                    new User
                     {
                         Id = 1,
                         FirstName = "Normal",
@@ -34,14 +34,14 @@ namespace JewelryStoreAPI.Helper
                         Role= "Regular",
                         PasswordHash = passwordHash,
                         PasswordSalt = passwordSalt,
-                        Discount = new Entity.Discount
+                        Discount = new Discount
                         {
                             Id = 1,
                             UserID = 1,
                             Percentage = 0
                         }
                     },
-                    new Entity.User
+                    new User
                     {
                         Id = 2,
                         FirstName = "Privileged",
@@ -50,7 +50,7 @@ namespace JewelryStoreAPI.Helper
                         Role= "Privileged",
                         PasswordHash = passwordHash,
                         PasswordSalt = passwordSalt,
-                        Discount = new Entity.Discount
+                        Discount = new Discount
                         {
                             Id = 2,
                             UserID = 2,

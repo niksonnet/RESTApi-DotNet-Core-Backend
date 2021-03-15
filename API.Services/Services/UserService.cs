@@ -1,36 +1,39 @@
-﻿using JewelryStoreAPI.Entity;
-using JewelryStoreAPI.Helper;
+﻿using API.Domain.Entity;
+using API.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace JewelryStoreAPI.Service
+namespace API.Services.Services
 {
     public class UserService : IUserService
     {
-        private UserDbContext _context;
+        private readonly UserDbContext _context;
 
         public UserService(UserDbContext context)
         {
-            _context = context;
+            this._context = context;
         }
         public User GetById(int id)
         {
-            //return _context.Users.Find(id);
             return _context.Users
                         .Include(x => x.Discount)
                         .Where(x => x.Id == id)
+                        .SingleOrDefault();
+        }
+        public User GetByName(string username)
+        {
+            return _context.Users
+                        .Include(x => x.Discount)
+                        .Where(x => x.Username == username)
                         .SingleOrDefault();
         }
         public User Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
-
-            //var user = _context.Users.SingleOrDefault(x => x.Username == username);
 
             var user = _context.Users
                         .Include(x => x.Discount)
@@ -45,9 +48,22 @@ namespace JewelryStoreAPI.Service
             if (!UtilityService.VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                 return null;
 
-            // authentication successful
             return user;
         }
 
+        public decimal CalculateFinalAmount(decimal Rate, decimal Weight, decimal Discount)
+        {
+            return Discount > 0 ? (Rate * Weight) * Discount / 100 : Rate * Weight;
+        }
+        
+        public bool SaveUsers(List<User> Users)
+        {
+            if (Users.Count == 0 || !Users.Any() )
+                throw new ArgumentNullException("Users List Can not be Empty/Null");
+            
+            _context.Users.AddRange(Users);
+
+            return true;
+        }
     }
 }

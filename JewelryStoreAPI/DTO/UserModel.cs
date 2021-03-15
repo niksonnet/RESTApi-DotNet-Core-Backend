@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace JewelryStoreAPI.DTO
+﻿namespace JewelryStoreAPI.DTO
 {
     public class UserModel
     {
@@ -14,5 +9,6 @@ namespace JewelryStoreAPI.DTO
         public string Password { get; set; }
 
         public string Role { get; set; }
+        public DiscountModel Discount { get; set; }
     }
 }

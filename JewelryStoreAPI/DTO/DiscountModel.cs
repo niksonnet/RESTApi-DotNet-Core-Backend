@@ -2,6 +2,10 @@
 {
     public class DiscountModel
     {
-        public double Percentage { get; set; }
+        public int Id { get; set; }
+        public int UserID { get; set; }
+        public decimal Percentage { get; set; }
+
+        public UserModel User { get; set; }
     }
 }

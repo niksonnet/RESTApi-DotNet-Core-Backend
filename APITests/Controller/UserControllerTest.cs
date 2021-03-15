@@ -1,11 +1,12 @@
-﻿using AutoFixture;
+﻿using API.Services.Services;
+using AutoFixture;
 using AutoMapper;
 using JewelryStoreAPI.Controllers;
 using JewelryStoreAPI.DTO;
 using JewelryStoreAPI.Helper;
-using JewelryStoreAPI.Service;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
@@ -22,16 +23,17 @@ namespace APITests
     {
         private IUserService _userService;
         private IMapper _mapper;
-        private readonly IOptions<Setting> _appSettings;
+        private readonly IConfiguration _configuration;
 
+        //IOptions<Setting> appSettings)
         public UserControllerTest(
             IUserService userService,
             IMapper mapper,
-            IOptions<Setting> appSetting)
+            IConfiguration configuration)
         {
             _userService = userService;
             _mapper = mapper;
-            _appSettings = appSetting;
+            _configuration = configuration;
         }
 
         [Fact]
@@ -52,9 +54,9 @@ namespace APITests
             var client = new HttpClient(mockHttpMessageHandler.Object);
             client.BaseAddress = fixture.Create<Uri>();
             httpClientFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
-
-            var controller = new UserController(_userService, _mapper, _appSettings);
-            var result =  controller.Authenticate(new UserModel { Username = "Regular", Password = "Test@123" });
+            
+            var controller = new UserController(_userService, _mapper, _configuration);
+            var result = controller.Authenticate(new UserModel { Username = "Regular", Password = "Test@123" });
 
             Assert.NotNull(result);
             Assert.IsAssignableFrom<OkObjectResult>(result);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Infrastructure.DbContext;
 using JewelryStoreAPI.Helper;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -28,8 +29,9 @@ namespace JewelryStoreAPI
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<UserDbContext>();
 
-                //4. Create sample data
                 DataGenerator.Initialize(services);
+                //4. Create sample data
+                //DataGenerator.Initialize();
             }
 
             //Continue to run the application

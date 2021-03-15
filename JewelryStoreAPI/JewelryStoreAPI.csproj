@@ -21,4 +21,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\API.Infrastructure\API.Infrastructure.csproj" />
+    <ProjectReference Include="..\API.Services\API.Services.csproj" />
+  </ItemGroup>
+
 </Project>

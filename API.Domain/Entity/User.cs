@@ -1,4 +1,4 @@
-﻿namespace JewelryStoreAPI.Entity
+﻿namespace API.Domain.Entity
 {
     public class User
     {

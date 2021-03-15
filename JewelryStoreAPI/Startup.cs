@@ -7,11 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 using JewelryStoreAPI.Helper;
 using Microsoft.EntityFrameworkCore;
-using JewelryStoreAPI.Service;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using System.Threading.Tasks;
+using API.Services.Services;
+using API.Infrastructure.DbContext;
+using Newtonsoft.Json;
 
 namespace JewelryStoreAPI
 {
@@ -28,9 +30,10 @@ namespace JewelryStoreAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddDbContext<UserDbContext>(x => x.UseInMemoryDatabase(databaseName: "JewelryDB01"));
-            services.AddMvc();
-
+            services.AddDbContext<UserDbContext>(x => x.UseInMemoryDatabase(databaseName: "JewelryDB02"));
+            //services.AddMvc();
+            services.AddMvc().AddJsonOptions(opt =>
+                             opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             services.AddSwaggerGen(p =>
             {
                 p.SwaggerDoc("v1",
@@ -94,6 +97,7 @@ namespace JewelryStoreAPI
 
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ISetting, Setting>();
             #endregion
 
 
@@ -129,7 +133,7 @@ namespace JewelryStoreAPI
                 p.SwaggerEndpoint("/swagger/v1/swagger.json", "Jewelry API V1");
                 p.RoutePrefix = string.Empty;
             });
-            
+
         }
     }
 }

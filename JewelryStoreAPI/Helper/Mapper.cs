@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+﻿using API.Domain.Entity;
+using AutoMapper;
 using JewelryStoreAPI.DTO;
-using JewelryStoreAPI.Entity;
 
 namespace JewelryStoreAPI.Helper
 {

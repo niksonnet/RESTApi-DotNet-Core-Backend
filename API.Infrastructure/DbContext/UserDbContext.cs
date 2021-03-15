@@ -1,9 +1,9 @@
-﻿using JewelryStoreAPI.Entity;
+﻿using API.Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 
-namespace JewelryStoreAPI.Helper
+namespace API.Infrastructure.DbContext
 {
-    public class UserDbContext : DbContext
+    public class UserDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
         public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
@@ -12,9 +12,11 @@ namespace JewelryStoreAPI.Helper
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
-                .HasOne<Discount>(s => s.Discount)
+                .HasOne(s => s.Discount)
                 .WithOne(ad => ad.User)
                 .HasForeignKey<Discount>(ad => ad.UserID);
         }
+
+        
     }
 }

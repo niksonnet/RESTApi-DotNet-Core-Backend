@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
-using JewelryStoreAPI.DTO;
-using JewelryStoreAPI.Entity;
-using JewelryStoreAPI.Helper;
-using JewelryStoreAPI.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+using API.Services.Services;
+using JewelryStoreAPI.DTO;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.SqlServer.Server;
 
 namespace JewelryStoreAPI.Controllers
 {
@@ -15,21 +16,24 @@ namespace JewelryStoreAPI.Controllers
     public class UserController : ControllerBase
     {
         #region Declarations
-            private IUserService _userService;
-            private IMapper _mapper;
-            private readonly Setting _appSettings;
+        private IUserService _iuserService;
+        private IMapper _mapper;
+        private readonly IConfiguration _configuration;
+
         #endregion
 
         #region Ctor
         public UserController(
-            IUserService userService,
+            IUserService iuserService,
             IMapper mapper,
-            IOptions<Setting> appSettings)
+            IConfiguration configuration)
         {
-            _userService = userService;
-            _mapper = mapper;
-            _appSettings = appSettings.Value;
+            this._iuserService = iuserService;
+            this._mapper = mapper;
+            this._configuration = configuration;
         }
+
+
         #endregion
 
         #region Actions
@@ -37,30 +41,52 @@ namespace JewelryStoreAPI.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]UserModel userModel)
         {
-            var user = _userService.Authenticate(userModel.Username, userModel.Password);
+            var user = _iuserService.Authenticate(userModel.Username, userModel.Password);
 
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
-            
-            var tokenString = UtilityService.GenerateJWT(user.Id.ToString(), _appSettings.Secret); ;
-            
+
+            var Secret = _configuration.GetValue<string>("AppSettings:Secret");
+            var tokenString = UtilityService.GenerateJWT(user.Id.ToString(), Secret);
+
             return Ok(new
             {
-               // Id = user.Id,
-                //FirstName = user.FirstName,
-                //LastName = user.LastName,
                 Username = user.Username,
                 Role = user.Role,
                 Discount = new { Percentage = user.Discount.Percentage },
                 Token = tokenString
             });
         }
+
         [HttpGet("GetUser")]
         public IActionResult GetById(int id)
         {
-            var user = _userService.GetById(id);
+            var user = _iuserService.GetById(id);
+            
+            if (user == null)
+                return BadRequest(new { message = "Invalid Request" });
+
             var userDto = _mapper.Map<UserModel>(user);
             return Ok(userDto);
+        }
+
+        [HttpPost("CalculateAmount")]
+        public IActionResult CalculateAmount([FromForm] string Username, [FromForm]decimal Rate, [FromForm]decimal Weight)
+        {
+            var user = _iuserService.GetByName(Username);
+
+            if (user == null)
+                return BadRequest(new { message = "Invalid Request" });
+
+            decimal discount = user.Discount != null ? user.Discount.Percentage : decimal.Zero;
+
+            var Amount = _iuserService.CalculateFinalAmount(Rate, Weight, discount);
+
+            return Ok(new
+            {
+                Total = Amount,
+                Discount = new { Percentage = 0 },
+            }); ;
         }
         #endregion
     }

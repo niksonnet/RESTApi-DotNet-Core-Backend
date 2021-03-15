@@ -4,11 +4,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace JewelryStoreAPI.Service
+namespace API.Services.Services
 {
     public static class UtilityService
     {
-        public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        public static bool CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             if (password == null) throw new ArgumentNullException("password");
             if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
@@ -18,6 +18,8 @@ namespace JewelryStoreAPI.Service
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
+
+            return true;
         }
 
         public static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
@@ -39,7 +41,7 @@ namespace JewelryStoreAPI.Service
             return true;
         }
 
-        public static string GenerateJWT(string UserID,string Secret)
+        public static string GenerateJWT(string UserID, string Secret)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Secret);//_appSettings.Secret
