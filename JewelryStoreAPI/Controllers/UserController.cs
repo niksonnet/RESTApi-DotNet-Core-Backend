@@ -70,17 +70,17 @@ namespace JewelryStoreAPI.Controllers
             return Ok(userDto);
         }
 
-        [HttpPost("CalculateAmount")]
-        public IActionResult CalculateAmount([FromForm] string Username, [FromForm]decimal Rate, [FromForm]decimal Weight)
+        [HttpPost("Estimation")]
+        public IActionResult CalculateAmount([FromBody]EstimationModel estimation)
         {
-            var user = _iuserService.GetByName(Username);
+            var user = _iuserService.GetByName(estimation.Username);
 
             if (user == null)
                 return BadRequest(new { message = "Invalid Request" });
 
             decimal discount = user.Discount != null ? user.Discount.Percentage : decimal.Zero;
 
-            var Amount = _iuserService.CalculateFinalAmount(Rate, Weight, discount);
+            var Amount = _iuserService.CalculateFinalAmount(estimation.Rate, estimation.Weight, discount);
 
             return Ok(new
             {
