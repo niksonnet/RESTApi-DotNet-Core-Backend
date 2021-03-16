@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using API.Services.Services;
 using JewelryStoreAPI.DTO;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.SqlServer.Server;
+using System.Threading.Tasks;
 
 namespace JewelryStoreAPI.Controllers
 {
